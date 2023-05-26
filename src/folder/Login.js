@@ -26,7 +26,10 @@ function Login() {
         }
 
  }
+ const handlesignup =()=>{
+    navigate('/signup');
 
+ }
       return (
         <div className="main-div">
             <form onSubmit={loginUser}>
@@ -36,6 +39,7 @@ function Login() {
                     <input type="text" className="password-input" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}></input><br />
 
                     <button className="Btn-login" type="Submit">Login</button>
+                    <p style={{fontSize:"14px"}} onClick={handlesignup}>signup first</p>
                 </div>
             </form>
         </div>

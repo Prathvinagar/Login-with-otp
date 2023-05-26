@@ -4,7 +4,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./folder/Login";
 import Home from "../src/folder/Home";
 import Signup from "../src/folder/Signup";
-import Otp from "./folder/Otp";
+import Otpscreen from "./folder/Otpscreen";
+import Normal from "./folder/Normal";
 
 function App() {
   return (
@@ -13,10 +14,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/otp" element={<Otp />} />
+          <Route path="/normal" element={<Normal />} />
+          <Route path="/otpscreen" element={<Otpscreen />} />
           <Route path="/home" element={<Home />} />
         </Routes>
       </BrowserRouter>
+    
     </div>
   );
 }
