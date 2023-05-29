@@ -2,17 +2,22 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import "./signup.css";
 import countrydata from "../folder/Countrydata.json";
+import Countrycode from "../folder/Countrycode.json";
 import { useNavigate } from "react-router-dom";
 import { Password } from "@mui/icons-material";
+import PhoneInput from "react-phone-number-input";
 
 const Signup = () => {
   const [firstname, setFirstName] = useState("");
   const [lastname, setLastName] = useState("");
+  const [lError, setLError] = useState(false);
   const [mobile, setMobile] = useState("");
   const [mobileError, setMobileError] = useState(false);
   const [pincode, setPincode] = useState("");
   const [pinError, setPinError] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [countryid, setCountryid] = useState();
@@ -21,6 +26,9 @@ const Signup = () => {
   const [otp, setOtp] = useState("");
 
   const navigate = useNavigate();
+
+  const regex =
+    /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
 
   const emailregex =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -40,9 +48,9 @@ const Signup = () => {
     const lname = e.target.value;
 
     if (lname.length <= 3) {
-      setNameError(true);
+      setLError(true);
     } else {
-      setNameError(false);
+      setLError(false);
     }
     setLastName(lname);
   };
@@ -59,7 +67,6 @@ const Signup = () => {
   };
   const handleMobile = (e) => {
     const mobileno = e.target.value;
-    // console.log("KKKK", mobileno);
 
     if (mobileno.length != 10) {
       setMobileError(true);
@@ -68,7 +75,7 @@ const Signup = () => {
     }
     setMobile(mobileno);
   };
-
+  const handleCountrycode = (e) => {};
   const handlePincode = (e) => {
     const Pinno = e.target.value;
 
@@ -89,6 +96,15 @@ const Signup = () => {
 
     setStates(getstatedata.states);
   };
+  const handlePassword = (e) => {
+    const password = e.target.value;
+    setPassword(password);
+    if (password.match(regex)) {
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -104,9 +120,9 @@ const Signup = () => {
     const lname = e.target[1].value;
 
     if (lname.length <= 3) {
-      setNameError(true);
+      setLError(true);
     } else {
-      setNameError(false);
+      setLError(false);
     }
     setLastName(lname);
 
@@ -128,12 +144,19 @@ const Signup = () => {
 
     const Pinno = e.target[4].value;
 
-    if (Pinno.length > 6) {
+    if (Pinno.length > 6 || Pinno == "") {
       setPinError(true);
     } else {
       setPinError(false);
     }
 
+    const password = e.target[5].value;
+
+    if (!password.match(regex)) {
+      setPasswordError(true);
+    } else {
+      setPasswordError(false);
+    }
     if (
       firstname === "" ||
       lastname === "" ||
@@ -141,29 +164,19 @@ const Signup = () => {
       pincode === "" ||
       email === "" ||
       states === "" ||
-      countryid === ""
+      countryid === "" ||
+      password === ""
     ) {
       alert("Please Filled All Input filed");
       navigate("/signup");
     } else {
       let oneTimePass = Math.floor(100000 + Math.random() * 1000);
 
-      localStorage.setItem('data', oneTimePass);
+      localStorage.setItem("data", oneTimePass);
+      console.log("otp", oneTimePass);
       alert("Form is Sumbit");
       navigate("/otpscreen");
-
-      setFirstName("");
-      setCountryid("");
-      setEmail("");
-      setLastName("");
-      setPincode("");
-      setMobile("");
-      console.log("ddddd",oneTimePass);
     }
-
-    // let oneTimePass = Math.floor(100000 + Math.random() * 1000);
-    // console.log("ddddd",oneTimePass);
-    // <Otpscreen oneTimePass={oneTimePass} />
   };
 
   return (
@@ -174,61 +187,176 @@ const Signup = () => {
         <div className="containerdiv">
           <form onSubmit={handleSubmit}>
             <div className="firstdiv">
-              <label className="firtstext">Firstname:</label>
-              <input
-                placeholder="Firstname"
-                type="text"
-                id="firstName"
-                value={firstname}
-                onChange={handleFirst}
-              />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="firtstext">Firstname:</label>
+                  <input
+                    placeholder="Firstname"
+                    type="text"
+                    id="firstName"
+                    value={firstname}
+                    onChange={handleFirst}
+                  />
+                </div>
+                {nameError ? (
+                  <span
+                    style={{
+                      color: "red",
+                      fontSize: "12px",
+                      paddingLeft: "10px",
+                    }}
+                  >
+                    Name length must be greater then 2 characters
+                  </span>
+                ) : (
+                  " "
+                )}
+              </div>
 
-              {nameError ? (
-                <span>Name length must be greater then 2 characters</span>
-              ) : (
-                " "
-              )}
-
-              <label className="lasttext">lasttname:</label>
-              <input
-                placeholder="Lastname"
-                type="text"
-                id="LastName"
-                value={lastname}
-                onChange={handleLast}
-              />
-              {nameError ? (
-                <span>Name length must be greater then 2 characters</span>
-              ) : (
-                " "
-              )}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="lasttext">lasttname:</label>
+                  <input
+                    placeholder="Lastname"
+                    type="text"
+                    id="LastName"
+                    value={lastname}
+                    onChange={handleLast}
+                  />
+                </div>
+                {lError ? (
+                  <span
+                    style={{
+                      color: "red",
+                      fontSize: "12px",
+                      paddingLeft: "50px",
+                    }}
+                  >
+                    Name length must be greater then 2 characters
+                  </span>
+                ) : (
+                  " "
+                )}
+              </div>
             </div>
+            <br />
+            <br />
 
             <div className="secdiv">
-              <label className="mailtext">Email:</label>
-              <input
-                placeholder="Email"
-                type="text"
-                id="email"
-                value={email}
-                onChange={handleEmail}
-              />
-              {emailError ? (
-                <span style={{ color: "red" }}>Invalid-Email</span>
-              ) : (
-                " "
-              )}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="mailtext">Email:</label>
+                  <input
+                    placeholder="Email"
+                    type="text"
+                    id="email"
+                    value={email}
+                    onChange={handleEmail}
+                  />
+                </div>
+                {emailError ? (
+                  <span
+                    style={{
+                      color: "red",
+                      fontSize: "12px",
+                      paddingLeft: "44px",
+                    }}
+                  >
+                    Invalid-Email
+                  </span>
+                ) : (
+                  " "
+                )}
+              </div>
 
-              <label className="mobtext">Mobile.no:</label>
-              <input
-                placeholder="Mobile-No"
-                type="text"
-                id="Mobno"
-                value={mobile}
-                onChange={handleMobile}
-              />
-              {mobileError ? <span>Invalid Mob-no</span> : " "}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="mobtext">Mobile.no:</label>
+                  <select
+                    name="Countrycode"
+                    className="countrycode"
+                    onChange={(e) => handleCountrycode(e)}
+                  >
+                    <option>code</option>
+
+                    {Countrycode.map((getcode, index) => {
+                      return (
+                        <option value={getcode.id} key={index}>
+                          {getcode.code}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <input
+                    placeholder="Mobile-No"
+                    type="text"
+                    id="Mobno"
+                    value={mobile}
+                    onChange={handleMobile}
+                  ></input>
+                </div>
+
+                {mobileError ? (
+                  <span
+                    style={{
+                      color: "red",
+                      fontSize: "12px",
+                      paddingLeft: "50px",
+                    }}
+                  >
+                    Invalid Mob-no
+                  </span>
+                ) : (
+                  " "
+                )}
+              </div>
             </div>
+            <br />
+            <br />
 
             <div className="thirddiv">
               <label className="countrytext">Country:</label>
@@ -259,28 +387,88 @@ const Signup = () => {
                 })}
               </select>
             </div>
+            <br />
+            <br />
 
             <div className="fourthdiv">
-              <label className="citytext">Password:</label>
-              <input></input>
-              <label className="pintext">Pincode:</label>
-              <input
-                placeholder="Pin-Code"
-                type="text"
-                id="Pin"
-                value={pincode}
-                onChange={handlePincode}
-              />
-              {pinError ? (
-                <span>Invalid Pincode Pincode maximum Number is 6</span>
-              ) : (
-                ""
-              )}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="citytext">Password:</label>
+                  <input
+                    placeholder="Password"
+                    type="text"
+                    id="pass"
+                    value={password}
+                    onChange={handlePassword}
+                  />
+                </div>
+                {passwordError ? (
+                  <span
+                    style={{
+                      color: "red",
+                      fontSize: "12px",
+                      paddingLeft: "15px",
+                    }}
+                  >
+                    Please input correct password
+                  </span>
+                ) : (
+                  ""
+                )}
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="pintext">Pincode:</label>
+                  <input
+                    placeholder="Pin-Code"
+                    type="text"
+                    id="Pin"
+                    value={pincode}
+                    onChange={handlePincode}
+                  />
+                </div>
+
+                {pinError ? (
+                  <span
+                    style={{
+                      color: "red",
+                      fontSize: "12px",
+                      paddingLeft: "60px",
+                    }}
+                  >
+                    Invalid Pincode maximum Number is 6
+                  </span>
+                ) : (
+                  " "
+                )}
+              </div>
             </div>
 
             <button className="otp-btn">Generate-Otp</button>
           </form>
-        
         </div>
       </div>
     </div>
@@ -288,5 +476,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
-
