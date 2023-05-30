@@ -10,7 +10,7 @@ const Otp = () => {
   const [genOtp, setgenOtp] = useState(data);
 
   const [otp, setOtp] = useState("");
-  const [seconds, setSeconds] = useState(0);
+  const [seconds, setSeconds] = useState(30);
 
   const verifyOtp = () => {
     const flage = otp == genOtp;
@@ -34,7 +34,7 @@ const Otp = () => {
 
   const resendOtp = () => {
     localStorage.clear("data");
-    setSeconds(0);
+    setSeconds(30);
     let newData = Math.floor(100000 + Math.random() * 1000);
     setgenOtp(newData);
     console.log("resendPass", newData);
@@ -43,11 +43,13 @@ const Otp = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setSeconds((prevSeconds) => prevSeconds + 1);
+      setSeconds((prevSeconds) => prevSeconds - 1);
     }, 1000);
-
+    if (seconds === 0) {
+      clearInterval(interval);
+    }
     return () => clearInterval(interval);
-  }, []);
+  }, [seconds]);
 
   return (
     <>

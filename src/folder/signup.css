@@ -4,12 +4,17 @@
     padding:0px;
   
 }
+.headingsignup{
+    padding-left: 250px;
+}
 
 .formdiv{
 
-    height: 500px;
-    width: 800px;
+    height: 600px;
+    width: 700px;
     border: 1px solid black;
+    margin-left: 300px;
+    margin-top: 50px;
 }
 .containerdiv{
 
@@ -55,12 +60,14 @@ padding-left: 43px;
 }
 .stattext{
     padding-left: 80px;
+  
+  
 }
 .citytext{
-    padding-left: 15px;
+    padding-left: 55px;
 }
 .pintext{
-    padding-left: 60px;
+    padding-left:60px;
 
 }
 
@@ -70,8 +77,8 @@ height: 50px;
 position: relative;
 display: flex;
 flex-direction: row;
-left:200px;
-top:40px;
+left:250px;
+top:100px;
 padding-left: 30px;
 padding-top: 13px;
 background-color: black;
@@ -79,11 +86,31 @@ color: bisque;
 
 }
 
-.countryselect{
-    width: 190px;
-}
+
 .dropdown{
 width: 200px;
 height: 40px;
  border: 1px solid black;
+}
+.inputfield{
+
+   
+    width: 200px;
+}
+.inputfieldmob{
+    width: 150px;
+}
+.inputfieldstates{
+    width: 210px;
+}
+.inputfieldcountry{
+    width: 210px;
+}
+.inputfieldcity {
+
+    width: 210px;
+}
+.passtext{
+    padding-left: 50px;
+   
 }

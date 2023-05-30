@@ -6,6 +6,7 @@ import Countrycode from "../folder/Countrycode.json";
 import { useNavigate } from "react-router-dom";
 import { Password } from "@mui/icons-material";
 import PhoneInput from "react-phone-number-input";
+import { Country, State, city } from "country-state-city";
 
 const Signup = () => {
   const [firstname, setFirstName] = useState("");
@@ -21,9 +22,11 @@ const Signup = () => {
   const [emailError, setEmailError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [countryid, setCountryid] = useState();
+  const [city, setCity] = useState();
   const [states, setStates] = useState([]);
   const [stateid, setStateid] = useState();
   const [otp, setOtp] = useState("");
+  const [emptyerror, setEmptyerror] = useState(false);
 
   const navigate = useNavigate();
 
@@ -36,19 +39,22 @@ const Signup = () => {
   const handleFirst = (e) => {
     const fname = e.target.value;
 
-    if (fname.length <= 3) {
-      setNameError(true);
+    if (!fname) {
+      setNameError("Please Enter Firstname");
+    } else if (fname.length <= 3) {
+      setNameError("Name length must be greater then 2 characters");
     } else {
-      setNameError(false);
+      setNameError("");
     }
     setFirstName(fname);
   };
 
   const handleLast = (e) => {
     const lname = e.target.value;
-
-    if (lname.length <= 3) {
-      setLError(true);
+    if (!lname) {
+      setLError("Please Enter lastname");
+    } else if (lname.length <= 3) {
+      setLError("Name length must be greater then 2 characters");
     } else {
       setLError(false);
     }
@@ -57,35 +63,28 @@ const Signup = () => {
 
   const handleEmail = (e) => {
     const mail = e.target.value;
-
-    if (!mail.match(emailregex)) {
-      setEmailError(true);
+    if (!mail) {
+      setEmailError("please Enter Email");
+    } else if (!mail.match(emailregex)) {
+      setEmailError("Invalid Email");
     } else {
-      setEmailError(false);
+      setEmailError("");
     }
     setEmail(mail);
   };
   const handleMobile = (e) => {
     const mobileno = e.target.value;
 
-    if (mobileno.length != 10) {
-      setMobileError(true);
+    if (mobileno === "") {
+      setMobileError("Please Enter Mobile.no");
+    } else if (mobileno.length !== 10 && mobileno.length > 1) {
+      setMobileError("Mob no is less than 10 number");
     } else {
       setMobileError(false);
     }
     setMobile(mobileno);
   };
   const handleCountrycode = (e) => {};
-  const handlePincode = (e) => {
-    const Pinno = e.target.value;
-
-    if (Pinno.length > 6) {
-      setPinError(true);
-    } else {
-      setPinError(false);
-    }
-    setPincode(Pinno);
-  };
 
   const handleCountry = (e) => {
     const getcountryId = e.target.value;
@@ -98,28 +97,33 @@ const Signup = () => {
   };
   const handlePassword = (e) => {
     const password = e.target.value;
-    setPassword(password);
-    if (password.match(regex)) {
-      setPasswordError(false);
+
+    if (password === "") {
+      setPasswordError("Please Enter Password");
+    } else if (!password.match(regex)) {
+      setPasswordError("Password Contain 1 Capital-letter,symbol & Number");
     } else {
-      setPasswordError(true);
+      setPasswordError(false);
     }
+    setPassword(password);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const fname = e.target[0].value;
-
-    if (fname.length <= 3) {
-      setNameError(true);
+    if (!fname) {
+      setNameError("Please Enter Firstname");
+    } else if (fname.length <= 3) {
+      setNameError("Name is too sort");
     } else {
-      setNameError(false);
+      setNameError("");
     }
 
     const lname = e.target[1].value;
-
-    if (lname.length <= 3) {
+    if (!lname) {
+      setLError("Please Enter lastname");
+    } else if (lname.length <= 3) {
       setLError(true);
     } else {
       setLError(false);
@@ -127,47 +131,43 @@ const Signup = () => {
     setLastName(lname);
 
     const mail = e.target[2].value;
-
-    if (!mail.match(emailregex)) {
-      setEmailError(true);
+    if (!mail) {
+      setEmailError("Please Enter Email");
+    } else if (!mail.match(emailregex)) {
+      setEmailError("Invalid Email");
     } else {
       setEmailError(false);
     }
 
     const mobileno = e.target[3].value;
 
-    if (mobileno.length != 10) {
-      setMobileError(true);
+    if (!mobile) {
+      setMobileError("Please Enter Mobile.no");
+    } else if (mobileno.length !== 10 && mobileno.length > 1) {
+      setMobileError("Mob no is less than 10 number");
     } else {
       setMobileError(false);
     }
 
-    const Pinno = e.target[4].value;
-
-    if (Pinno.length > 6 || Pinno == "") {
-      setPinError(true);
-    } else {
-      setPinError(false);
-    }
-
-    const password = e.target[5].value;
-
-    if (!password.match(regex)) {
-      setPasswordError(true);
+    const password = e.target[8].value;
+    if (!password) {
+      console.log("password", password);
+      setPasswordError("Please Enter Password");
+    } else if (!password.match(regex)) {
+      setPasswordError("Password Contain 1 Capital-letter,symbol & Number");
     } else {
       setPasswordError(false);
     }
+
     if (
       firstname === "" ||
       lastname === "" ||
       mobile === "" ||
-      pincode === "" ||
       email === "" ||
       states === "" ||
       countryid === "" ||
       password === ""
     ) {
-      alert("Please Filled All Input filed");
       navigate("/signup");
     } else {
       let oneTimePass = Math.floor(100000 + Math.random() * 1000);
@@ -179,10 +179,12 @@ const Signup = () => {
     }
   };
 
+  const handleCity = (e) => {};
+
   return (
     <div className="maindiv">
       <div className="formdiv">
-        <h1>Form</h1>
+        <h1 className="headingsignup">Signup-Form</h1>
 
         <div className="containerdiv">
           <form onSubmit={handleSubmit}>
@@ -207,21 +209,19 @@ const Signup = () => {
                     id="firstName"
                     value={firstname}
                     onChange={handleFirst}
+                    className="inputfield"
                   />
                 </div>
-                {nameError ? (
-                  <span
-                    style={{
-                      color: "red",
-                      fontSize: "12px",
-                      paddingLeft: "10px",
-                    }}
-                  >
-                    Name length must be greater then 2 characters
-                  </span>
-                ) : (
-                  " "
-                )}
+
+                <span
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    paddingLeft: "87px",
+                  }}
+                >
+                  {nameError}
+                </span>
               </div>
 
               <div
@@ -244,21 +244,19 @@ const Signup = () => {
                     id="LastName"
                     value={lastname}
                     onChange={handleLast}
+                    className="inputfield"
                   />
                 </div>
-                {lError ? (
-                  <span
-                    style={{
-                      color: "red",
-                      fontSize: "12px",
-                      paddingLeft: "50px",
-                    }}
-                  >
-                    Name length must be greater then 2 characters
-                  </span>
-                ) : (
-                  " "
-                )}
+
+                <span
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    paddingLeft: "127px",
+                  }}
+                >
+                  {lError}
+                </span>
               </div>
             </div>
             <br />
@@ -285,21 +283,19 @@ const Signup = () => {
                     id="email"
                     value={email}
                     onChange={handleEmail}
+                    className="inputfield"
                   />
                 </div>
-                {emailError ? (
-                  <span
-                    style={{
-                      color: "red",
-                      fontSize: "12px",
-                      paddingLeft: "44px",
-                    }}
-                  >
-                    Invalid-Email
-                  </span>
-                ) : (
-                  " "
-                )}
+
+                <span
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    paddingLeft: "87px",
+                  }}
+                >
+                  {emailError}
+                </span>
               </div>
 
               <div
@@ -337,22 +333,19 @@ const Signup = () => {
                     id="Mobno"
                     value={mobile}
                     onChange={handleMobile}
+                    className="inputfieldmob"
                   ></input>
                 </div>
 
-                {mobileError ? (
-                  <span
-                    style={{
-                      color: "red",
-                      fontSize: "12px",
-                      paddingLeft: "50px",
-                    }}
-                  >
-                    Invalid Mob-no
-                  </span>
-                ) : (
-                  " "
-                )}
+                <span
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    paddingLeft: "127px",
+                  }}
+                >
+                  {mobileError}
+                </span>
               </div>
             </div>
             <br />
@@ -362,8 +355,8 @@ const Signup = () => {
               <label className="countrytext">Country:</label>
               <select
                 name="Contries"
-                className="countryselect"
                 onChange={(e) => handleCountry(e)}
+                className="inputfieldcountry"
               >
                 <option>Select-Countries</option>
                 {countrydata.map((getcountry, index) => {
@@ -376,8 +369,10 @@ const Signup = () => {
               </select>
 
               <label className="stattext">State:</label>
-              <select name="states" className="statesselect">
-                <option>Select-States</option>
+              <select name="states" className="inputfieldstates">
+                <option style={{ backgroundColor: "black" }}>
+                  Select-States
+                </option>
                 {states.map((getstate, index) => {
                   return (
                     <option value={getstate.state_id} key={index}>
@@ -404,28 +399,16 @@ const Signup = () => {
                     flexDirection: "row",
                   }}
                 >
-                  <label className="citytext">Password:</label>
-                  <input
-                    placeholder="Password"
+                  <label className="citytext">city:</label>
+                  <select
+                    placeholder="City"
                     type="text"
-                    id="pass"
-                    value={password}
-                    onChange={handlePassword}
+                    value={city}
+                    onChange={handleCity}
+                    className="inputfieldcity"
                   />
+                  <option></option>
                 </div>
-                {passwordError ? (
-                  <span
-                    style={{
-                      color: "red",
-                      fontSize: "12px",
-                      paddingLeft: "15px",
-                    }}
-                  >
-                    Please input correct password
-                  </span>
-                ) : (
-                  ""
-                )}
               </div>
 
               <div
@@ -441,32 +424,28 @@ const Signup = () => {
                     flexDirection: "row",
                   }}
                 >
-                  <label className="pintext">Pincode:</label>
+                  <label className="passtext">Password:</label>
                   <input
-                    placeholder="Pin-Code"
-                    type="text"
-                    id="Pin"
-                    value={pincode}
-                    onChange={handlePincode}
+                    placeholder="Password"
+                    type="password"
+                    id="pass"
+                    value={password}
+                    onChange={handlePassword}
+                    className="inputfield"
                   />
                 </div>
 
-                {pinError ? (
-                  <span
-                    style={{
-                      color: "red",
-                      fontSize: "12px",
-                      paddingLeft: "60px",
-                    }}
-                  >
-                    Invalid Pincode maximum Number is 6
-                  </span>
-                ) : (
-                  " "
-                )}
+                <span
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    paddingLeft: "123px",
+                  }}
+                >
+                  {passwordError}
+                </span>
               </div>
             </div>
-
             <button className="otp-btn">Generate-Otp</button>
           </form>
         </div>

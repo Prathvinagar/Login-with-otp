@@ -11,6 +11,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "cities": "^2.0.0",
     "country-codes-list": "^1.6.10",
     "country-state-city": "^3.1.4",
     "material-icons-react": "^1.0.4",
