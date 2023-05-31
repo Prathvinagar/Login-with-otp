@@ -1,12 +1,10 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./signup.css";
 import countrydata from "../folder/Countrydata.json";
 import Countrycode from "../folder/Countrycode.json";
 import { useNavigate } from "react-router-dom";
-import { Password } from "@mui/icons-material";
-import PhoneInput from "react-phone-number-input";
-import { Country, State, city } from "country-state-city";
+
+import { Country, State, City } from "country-state-city";
 
 const Signup = () => {
   const [firstname, setFirstName] = useState("");
@@ -14,21 +12,20 @@ const Signup = () => {
   const [lError, setLError] = useState(false);
   const [mobile, setMobile] = useState("");
   const [mobileError, setMobileError] = useState(false);
-  const [pincode, setPincode] = useState("");
-  const [pinError, setPinError] = useState(false);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [nameError, setNameError] = useState(false);
-  const [countryid, setCountryid] = useState();
-  const [city, setCity] = useState();
-  const [states, setStates] = useState([]);
-  const [stateid, setStateid] = useState();
-  const [otp, setOtp] = useState("");
-  const [emptyerror, setEmptyerror] = useState(false);
+
+  const [countryCode, setCountryCode] = useState("");
+  const [states, setStates] = React.useState([]);
+  const [cities, setCities] = React.useState([]);
 
   const navigate = useNavigate();
+
+  const allCountry = Country.getAllCountries();
 
   const regex =
     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
@@ -84,17 +81,25 @@ const Signup = () => {
     }
     setMobile(mobileno);
   };
-  const handleCountrycode = (e) => {};
 
   const handleCountry = (e) => {
-    const getcountryId = e.target.value;
+    const countryIsoCode = e.target.value;
 
-    const getstatedata = countrydata.find(
-      (country) => country.country_id === getcountryId
-    );
+    setCountryCode(countryIsoCode);
+    const countryStates = State.getStatesOfCountry(countryIsoCode);
+    setStates(countryStates);
 
-    setStates(getstatedata.states);
+    console.log("jj", countryStates);
   };
+
+  const handleState = (e) => {
+    const stateIsoCode = e.target.value;
+
+    const stateCities = City.getCitiesOfState(countryCode, stateIsoCode);
+    setCities(stateCities);
+    console.log("GGGG", stateCities);
+  };
+
   const handlePassword = (e) => {
     const password = e.target.value;
 
@@ -165,7 +170,6 @@ const Signup = () => {
       mobile === "" ||
       email === "" ||
       states === "" ||
-      countryid === "" ||
       password === ""
     ) {
       navigate("/signup");
@@ -178,8 +182,6 @@ const Signup = () => {
       navigate("/otpscreen");
     }
   };
-
-  const handleCity = (e) => {};
 
   return (
     <div className="maindiv">
@@ -312,11 +314,7 @@ const Signup = () => {
                   }}
                 >
                   <label className="mobtext">Mobile.no:</label>
-                  <select
-                    name="Countrycode"
-                    className="countrycode"
-                    onChange={(e) => handleCountrycode(e)}
-                  >
+                  <select name="Countrycode" className="countrycode">
                     <option>code</option>
 
                     {Countrycode.map((getcode, index) => {
@@ -355,31 +353,31 @@ const Signup = () => {
               <label className="countrytext">Country:</label>
               <select
                 name="Contries"
-                onChange={(e) => handleCountry(e)}
                 className="inputfieldcountry"
+                onChange={(e) => handleCountry(e)}
               >
                 <option>Select-Countries</option>
-                {countrydata.map((getcountry, index) => {
-                  return (
-                    <option value={getcountry.country_id} key={index}>
-                      {getcountry.country_name}
-                    </option>
-                  );
-                })}
+
+                {allCountry.map((country) => (
+                  <option key={country.isoCode} value={country.isoCode}>
+                    {country.name}
+                  </option>
+                ))}
               </select>
 
-              <label className="stattext">State:</label>
-              <select name="states" className="inputfieldstates">
-                <option style={{ backgroundColor: "black" }}>
-                  Select-States
-                </option>
-                {states.map((getstate, index) => {
-                  return (
-                    <option value={getstate.state_id} key={index}>
-                      {getstate.state_name}
-                    </option>
-                  );
-                })}
+              <label className="stattext">States:</label>
+              <select
+                name="Contries"
+                className="inputfieldstates"
+                onChange={(e) => handleState(e)}
+              >
+                <option>Select-States</option>
+
+                {states.map((State) => (
+                  <option key={State.isoCode} value={State.isoCode}>
+                    {State.name}
+                  </option>
+                ))}
               </select>
             </div>
             <br />
@@ -401,13 +399,18 @@ const Signup = () => {
                 >
                   <label className="citytext">city:</label>
                   <select
-                    placeholder="City"
-                    type="text"
-                    value={city}
-                    onChange={handleCity}
-                    className="inputfieldcity"
-                  />
-                  <option></option>
+                    name="city"
+                    className="inputfieldcity {
+"
+                  >
+                    <option>Select-City</option>
+
+                    {cities.map((city) => (
+                      <option key={city.name} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

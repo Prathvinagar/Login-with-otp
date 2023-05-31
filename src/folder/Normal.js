@@ -1,28 +1,34 @@
 import { Country, State, City } from "country-state-city";
-import React from "react";
-import Dropdown from "react-dropdown";
-import PhoneInput from "react-phone-number-input";
+import React, { useState } from "react";
+
 import "./signup.css";
 
+const CountryAndStateComponent = () => {
+  let countryIsoCode = "";
+  const allCountry = Country.getAllCountries();
+  const [countryCode, setCountryCode] = useState("");
 
-const allCountry = Country.getAllCountries();
-
-const countryCodes = require("country-codes-list");
-console.log(allCountry);
-
-
-
-console.log("ddd", countryCodes);
-const CountryAndStateComponent = ({ countryCode = "IN" }) => {
-  const [state, setState] = React.useState([]);
-  const [value, setValue] = React.useState();
+  const [states, setStates] = React.useState([]);
+  const [cities, setCities] = React.useState([]);
 
   const handleCountry = (e) => {
-    const countrydata = e.target.value;
+    countryIsoCode = e.target.value;
+    setCountryCode(countryIsoCode);
+    const countryStates = State.getStatesOfCountry(countryIsoCode);
+    console.log("EEEE", countryStates);
+    setStates(countryStates);
+
+    console.log("jj", countryStates);
   };
 
-  const get = (e) => {
-    console.log(e);
+  const handleState = (e) => {
+    const stateIsoCode = e.target.value;
+    console.log("DDDd", stateIsoCode, "ggg", countryIsoCode);
+
+    const stateCities = City.getCitiesOfState(countryCode, stateIsoCode);
+    console.log("KKK", stateCities);
+    setCities(stateCities);
+    console.log("GGGG", stateCities);
   };
 
   return (
@@ -35,18 +41,36 @@ const CountryAndStateComponent = ({ countryCode = "IN" }) => {
       >
         <option>Select-Countries</option>
 
-        {allCountry.map((items) => (
-          <option onClick={(e) => get(e)}>{items.name}</option>
+        {allCountry.map((country) => (
+          <option key={country.isoCode} value={country.isoCode}>
+            {country.name}
+          </option>
         ))}
       </select>
 
-      <PhoneInput
-        international
-        countryCallingCodeEditable={false}
-        defaultCountry="RU"
-        value={value}
-        onChange={setValue}
-      />
+      <select
+        name="state"
+        className="Stateselect"
+        onChange={(e) => handleState(e)}
+      >
+        <option>Select-State</option>
+
+        {states.map((state) => (
+          <option key={state.isoCode} value={state.isoCode}>
+            {state.name}
+          </option>
+        ))}
+      </select>
+
+      <select name="city" className="Cityselect">
+        <option>Select-City</option>
+
+        {cities.map((city) => (
+          <option key={city.name} value={city.isoCode}>
+            {city.name}
+          </option>
+        ))}
+      </select>
     </>
   );
 };
