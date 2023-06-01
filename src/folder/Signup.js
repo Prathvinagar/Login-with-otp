@@ -89,7 +89,7 @@ const Signup = () => {
     const countryStates = State.getStatesOfCountry(countryIsoCode);
     setStates(countryStates);
 
-    console.log("jj", countryStates);
+  
   };
 
   const handleState = (e) => {
@@ -97,7 +97,7 @@ const Signup = () => {
 
     const stateCities = City.getCitiesOfState(countryCode, stateIsoCode);
     setCities(stateCities);
-    console.log("GGGG", stateCities);
+    
   };
 
   const handlePassword = (e) => {
@@ -156,7 +156,6 @@ const Signup = () => {
 
     const password = e.target[8].value;
     if (!password) {
-      console.log("password", password);
       setPasswordError("Please Enter Password");
     } else if (!password.match(regex)) {
       setPasswordError("Password Contain 1 Capital-letter,symbol & Number");
