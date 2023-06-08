@@ -11,7 +11,12 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "bcrypt": "^5.1.0",
+    "cities": "^2.0.0",
+    "country-codes-list": "^1.6.10",
     "country-state-city": "^3.1.4",
+    "crypto-js": "^4.1.1",
+    "firebase": "^9.22.1",
     "material-icons-react": "^1.0.4",
     "otp-generator": "^4.0.1",
     "otp-timer": "^1.1.5",
@@ -19,6 +24,7 @@
     "react-dom": "^18.2.0",
     "react-dropdown": "^1.11.0",
     "react-otp-input": "^3.0.2",
+    "react-phone-number-input": "^3.2.23",
     "react-router-dom": "^6.11.2",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
@@ -34,6 +40,11 @@
       "react-app",
       "react-app/jest"
     ]
+  },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
   },
   "browserslist": {
     "production": [

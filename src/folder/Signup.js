@@ -1,26 +1,39 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import "./signup.css";
-import countrydata from "../folder/Countrydata.json";
+import Countrycode from "./Countrycode.json";
 import { useNavigate } from "react-router-dom";
-import { Password } from "@mui/icons-material";
+import { Country, State, City } from "country-state-city";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { app } from "./firebase";
+import { enc, SHA256 } from "crypto-js";
+
+import { getDatabase, ref, set } from "firebase/database";
+import { compareSync } from "bcrypt";
+
+const auth = getAuth(app);
 
 const Signup = () => {
+  const db = getDatabase(app);
   const [firstname, setFirstName] = useState("");
   const [lastname, setLastName] = useState("");
+  const [lError, setLError] = useState(false);
   const [mobile, setMobile] = useState("");
   const [mobileError, setMobileError] = useState(false);
-  const [pincode, setPincode] = useState("");
-  const [pinError, setPinError] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [nameError, setNameError] = useState(false);
-  const [countryid, setCountryid] = useState();
-  const [states, setStates] = useState([]);
-  const [stateid, setStateid] = useState();
-  const [otp, setOtp] = useState("");
+  const [countryCode, setCountryCode] = useState("");
+  const [states, setStates] = React.useState([]);
+  const [cities, setCities] = React.useState([]);
 
   const navigate = useNavigate();
+
+  const allCountry = Country.getAllCountries();
+
+  const regex =
+    /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
 
   const emailregex =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -28,259 +41,432 @@ const Signup = () => {
   const handleFirst = (e) => {
     const fname = e.target.value;
 
-    if (fname.length <= 3) {
-      setNameError(true);
+    if (!fname) {
+      setNameError("Please Enter Firstname");
+    } else if (fname.length <= 3) {
+      setNameError("Name length must be greater then 2 characters");
     } else {
-      setNameError(false);
+      setNameError("");
     }
     setFirstName(fname);
   };
 
   const handleLast = (e) => {
     const lname = e.target.value;
-
-    if (lname.length <= 3) {
-      setNameError(true);
+    if (!lname) {
+      setLError("Please Enter lastname");
+    } else if (lname.length <= 3) {
+      setLError("Name length must be greater then 2 characters");
     } else {
-      setNameError(false);
+      setLError(false);
     }
     setLastName(lname);
   };
 
   const handleEmail = (e) => {
     const mail = e.target.value;
-
-    if (!mail.match(emailregex)) {
-      setEmailError(true);
+    if (!mail) {
+      setEmailError("please Enter Email");
+    } else if (!mail.match(emailregex)) {
+      setEmailError("Invalid Email");
     } else {
-      setEmailError(false);
+      setEmailError("");
     }
     setEmail(mail);
   };
   const handleMobile = (e) => {
     const mobileno = e.target.value;
-    // console.log("KKKK", mobileno);
 
-    if (mobileno.length != 10) {
-      setMobileError(true);
+    if (mobileno === "") {
+      setMobileError("Please Enter Mobile.no");
+    } else if (mobileno.length !== 10 && mobileno.length > 1) {
+      setMobileError("Mob no is less than 10 number");
     } else {
       setMobileError(false);
     }
     setMobile(mobileno);
   };
 
-  const handlePincode = (e) => {
-    const Pinno = e.target.value;
+  const handleCountry = (e) => {
+    const countryIsoCode = e.target.value;
 
-    if (Pinno.length > 6) {
-      setPinError(true);
-    } else {
-      setPinError(false);
-    }
-    setPincode(Pinno);
+    setCountryCode(countryIsoCode);
+    const countryStates = State.getStatesOfCountry(countryIsoCode);
+    setStates(countryStates);
   };
 
-  const handleCountry = (e) => {
-    const getcountryId = e.target.value;
+  const handleState = (e) => {
+    const stateIsoCode = e.target.value;
 
-    const getstatedata = countrydata.find(
-      (country) => country.country_id === getcountryId
-    );
+    const stateCities = City.getCitiesOfState(countryCode, stateIsoCode);
+    setCities(stateCities);
+  };
 
-    setStates(getstatedata.states);
+  const handlePassword = (e) => {
+    const password = e.target.value;
+    // const hashedPassword = bcrypt.hashSync(yourPasswordFromSignupForm, bcrypt.genSaltSync());
+
+    if (password === "") {
+      setPasswordError("Please Enter Password");
+    } else if (!password.match(regex)) {
+      setPasswordError("Password Contain 1 Capital-letter,symbol & Number");
+    } else {
+      setPasswordError(false);
+    }
+    setPassword(password);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const fname = e.target[0].value;
-
-    if (fname.length <= 3) {
-      setNameError(true);
+    if (!fname) {
+      setNameError("Please Enter Firstname");
+    } else if (fname.length <= 3) {
+      setNameError("Name is too sort");
     } else {
-      setNameError(false);
+      setNameError("");
     }
 
     const lname = e.target[1].value;
-
-    if (lname.length <= 3) {
-      setNameError(true);
+    if (!lname) {
+      setLError("Please Enter lastname");
+    } else if (lname.length <= 3) {
+      setLError(true);
     } else {
-      setNameError(false);
+      setLError(false);
     }
     setLastName(lname);
 
     const mail = e.target[2].value;
-
-    if (!mail.match(emailregex)) {
-      setEmailError(true);
+    if (!mail) {
+      setEmailError("Please Enter Email");
+    } else if (!mail.match(emailregex)) {
+      setEmailError("Invalid Email");
     } else {
       setEmailError(false);
     }
 
     const mobileno = e.target[3].value;
 
-    if (mobileno.length != 10) {
-      setMobileError(true);
+    if (!mobile) {
+      setMobileError("Please Enter Mobile.no");
+    } else if (mobileno.length !== 10 && mobileno.length > 1) {
+      setMobileError("Mob no is less than 10 number");
     } else {
       setMobileError(false);
     }
 
-    const Pinno = e.target[4].value;
-
-    if (Pinno.length > 6) {
-      setPinError(true);
+    const password = e.target[8].value;
+    if (!password) {
+      setPasswordError("Please Enter Password");
+    } else if (!password.match(regex)) {
+      setPasswordError("Password Contain 1 Capital-letter,symbol & Number");
     } else {
-      setPinError(false);
+      setPasswordError(false);
     }
+
+    let encrypted = SHA256(password).toString();
+    console.log("Hashing password " + encrypted);
+  
+  //  const  validate =createUserWithEmailAndPassword(auth,  email,  password)
+// console.log('validate', validate)
+    if (encrypted !== undefined) {
+
+      const data = { email: email,
+        password: encrypted,};
+      set(ref(db, 'users/' + firstname ), data);
+
+    }
+    
 
     if (
       firstname === "" ||
       lastname === "" ||
       mobile === "" ||
-      pincode === "" ||
       email === "" ||
       states === "" ||
-      countryid === ""
+      password === ""
     ) {
-      alert("Please Filled All Input filed");
       navigate("/signup");
     } else {
       let oneTimePass = Math.floor(100000 + Math.random() * 1000);
 
-      localStorage.setItem('data', oneTimePass);
+      localStorage.setItem("data", oneTimePass);
+      console.log("otp", oneTimePass);
       alert("Form is Sumbit");
       navigate("/otpscreen");
-
-      setFirstName("");
-      setCountryid("");
-      setEmail("");
-      setLastName("");
-      setPincode("");
-      setMobile("");
-      console.log("ddddd",oneTimePass);
     }
-
-    // let oneTimePass = Math.floor(100000 + Math.random() * 1000);
-    // console.log("ddddd",oneTimePass);
-    // <Otpscreen oneTimePass={oneTimePass} />
   };
 
   return (
     <div className="maindiv">
       <div className="formdiv">
-        <h1>Form</h1>
+        <h1 className="headingsignup">Signup-Form</h1>
 
         <div className="containerdiv">
           <form onSubmit={handleSubmit}>
             <div className="firstdiv">
-              <label className="firtstext">Firstname:</label>
-              <input
-                placeholder="Firstname"
-                type="text"
-                id="firstName"
-                value={firstname}
-                onChange={handleFirst}
-              />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="firtstext">Firstname:</label>
+                  <input
+                    placeholder="Firstname"
+                    type="text"
+                    id="firstName"
+                    value={firstname}
+                    onChange={handleFirst}
+                    className="inputfield"
+                  />
+                </div>
 
-              {nameError ? (
-                <span>Name length must be greater then 2 characters</span>
-              ) : (
-                " "
-              )}
+                <span
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    paddingLeft: "87px",
+                  }}
+                >
+                  {nameError}
+                </span>
+              </div>
 
-              <label className="lasttext">lasttname:</label>
-              <input
-                placeholder="Lastname"
-                type="text"
-                id="LastName"
-                value={lastname}
-                onChange={handleLast}
-              />
-              {nameError ? (
-                <span>Name length must be greater then 2 characters</span>
-              ) : (
-                " "
-              )}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="lasttext">lasttname:</label>
+                  <input
+                    placeholder="Lastname"
+                    type="text"
+                    id="LastName"
+                    value={lastname}
+                    onChange={handleLast}
+                    className="inputfield"
+                  />
+                </div>
+
+                <span
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    paddingLeft: "127px",
+                  }}
+                >
+                  {lError}
+                </span>
+              </div>
             </div>
+            <br />
+            <br />
 
             <div className="secdiv">
-              <label className="mailtext">Email:</label>
-              <input
-                placeholder="Email"
-                type="text"
-                id="email"
-                value={email}
-                onChange={handleEmail}
-              />
-              {emailError ? (
-                <span style={{ color: "red" }}>Invalid-Email</span>
-              ) : (
-                " "
-              )}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="mailtext">Email:</label>
+                  <input
+                    placeholder="Email"
+                    type="text"
+                    id="email"
+                    value={email}
+                    onChange={handleEmail}
+                    className="inputfield"
+                  />
+                </div>
 
-              <label className="mobtext">Mobile.no:</label>
-              <input
-                placeholder="Mobile-No"
-                type="text"
-                id="Mobno"
-                value={mobile}
-                onChange={handleMobile}
-              />
-              {mobileError ? <span>Invalid Mob-no</span> : " "}
+                <span
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    paddingLeft: "87px",
+                  }}
+                >
+                  {emailError}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="mobtext">Mobile.no:</label>
+                  <select name="Countrycode" className="countrycode">
+                    <option>code</option>
+
+                    {Countrycode.map((getcode, index) => {
+                      return (
+                        <option value={getcode.id} key={index}>
+                          {getcode.code}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <input
+                    placeholder="Mobile-No"
+                    type="text"
+                    id="Mobno"
+                    value={mobile}
+                    onChange={handleMobile}
+                    className="inputfieldmob"
+                  ></input>
+                </div>
+
+                <span
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    paddingLeft: "127px",
+                  }}
+                >
+                  {mobileError}
+                </span>
+              </div>
             </div>
+            <br />
+            <br />
 
             <div className="thirddiv">
               <label className="countrytext">Country:</label>
               <select
                 name="Contries"
-                className="countryselect"
+                className="inputfieldcountry"
                 onChange={(e) => handleCountry(e)}
               >
                 <option>Select-Countries</option>
-                {countrydata.map((getcountry, index) => {
-                  return (
-                    <option value={getcountry.country_id} key={index}>
-                      {getcountry.country_name}
-                    </option>
-                  );
-                })}
+
+                {allCountry.map((country) => (
+                  <option key={country.isoCode} value={country.isoCode}>
+                    {country.name}
+                  </option>
+                ))}
               </select>
 
-              <label className="stattext">State:</label>
-              <select name="states" className="statesselect">
+              <label className="stattext">States:</label>
+              <select
+                name="Contries"
+                className="inputfieldstates"
+                onChange={(e) => handleState(e)}
+              >
                 <option>Select-States</option>
-                {states.map((getstate, index) => {
-                  return (
-                    <option value={getstate.state_id} key={index}>
-                      {getstate.state_name}
-                    </option>
-                  );
-                })}
+
+                {states.map((State) => (
+                  <option key={State.isoCode} value={State.isoCode}>
+                    {State.name}
+                  </option>
+                ))}
               </select>
             </div>
+            <br />
+            <br />
 
             <div className="fourthdiv">
-              <label className="citytext">Password:</label>
-              <input></input>
-              <label className="pintext">Pincode:</label>
-              <input
-                placeholder="Pin-Code"
-                type="text"
-                id="Pin"
-                value={pincode}
-                onChange={handlePincode}
-              />
-              {pinError ? (
-                <span>Invalid Pincode Pincode maximum Number is 6</span>
-              ) : (
-                ""
-              )}
-            </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="citytext">city:</label>
+                  <select
+                    name="city"
+                    className="inputfieldcity {
+"
+                  >
+                    <option>Select-City</option>
 
+                    {cities.map((city) => (
+                      <option key={city.name} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <label className="passtext">Password:</label>
+                  <input
+                    placeholder="Password"
+                    type="password"
+                    id="pass"
+                    value={password}
+                    onChange={handlePassword}
+                    className="inputfield"
+                  />
+                </div>
+
+                <span
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    paddingLeft: "123px",
+                  }}
+                >
+                  {passwordError}
+                </span>
+              </div>
+            </div>
             <button className="otp-btn">Generate-Otp</button>
           </form>
-        
         </div>
       </div>
     </div>
@@ -288,5 +474,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
-

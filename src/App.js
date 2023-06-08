@@ -5,7 +5,7 @@ import Login from "./folder/Login";
 import Home from "../src/folder/Home";
 import Signup from "../src/folder/Signup";
 import Otpscreen from "./folder/Otpscreen";
-import Normal from "./folder/Normal";
+// import Testing from "./folder/Testing";
 
 function App() {
   return (
@@ -14,12 +14,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/normal" element={<Normal />} />
+
           <Route path="/otpscreen" element={<Otpscreen />} />
           <Route path="/home" element={<Home />} />
+          {/* <Route path="/testing" element={<Testing />} /> */}
         </Routes>
       </BrowserRouter>
-    
     </div>
   );
 }
