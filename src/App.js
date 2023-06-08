@@ -5,6 +5,7 @@ import Login from "./folder/Login";
 import Home from "../src/folder/Home";
 import Signup from "../src/folder/Signup";
 import Otpscreen from "./folder/Otpscreen";
+// import Testing from "./folder/Testing";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
 
           <Route path="/otpscreen" element={<Otpscreen />} />
           <Route path="/home" element={<Home />} />
+          {/* <Route path="/testing" element={<Testing />} /> */}
         </Routes>
       </BrowserRouter>
     </div>

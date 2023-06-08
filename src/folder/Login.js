@@ -2,6 +2,10 @@ import React from "react";
 import "./login.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { app } from "./firebase";
+
+const auth = getAuth(app);
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -15,10 +19,14 @@ function Login() {
   function loginUser(e) {
     e.preventDefault();
 
-    if (email === email1 && password === Password1) {
-      navigate("/signup");
-    }
+    // if (email === email1 && password === Password1) {
+    //   navigate("/signup");
+    // }
+    signInWithEmailAndPassword(auth, email, password)
+      .then((value) => navigate("/home"))
+      .catch((err) => alert("User Does-not exist"));
   }
+
   const handlesignup = () => {
     navigate("/signup");
   };

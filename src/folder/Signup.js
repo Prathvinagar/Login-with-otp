@@ -1,24 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./signup.css";
-import countrydata from "../folder/Countrydata.json";
-import Countrycode from "../folder/Countrycode.json";
+import Countrycode from "./Countrycode.json";
 import { useNavigate } from "react-router-dom";
-
 import { Country, State, City } from "country-state-city";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { app } from "./firebase";
+import { enc, SHA256 } from "crypto-js";
+
+import { getDatabase, ref, set } from "firebase/database";
+import { compareSync } from "bcrypt";
+
+const auth = getAuth(app);
 
 const Signup = () => {
+  const db = getDatabase(app);
   const [firstname, setFirstName] = useState("");
   const [lastname, setLastName] = useState("");
   const [lError, setLError] = useState(false);
   const [mobile, setMobile] = useState("");
   const [mobileError, setMobileError] = useState(false);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [nameError, setNameError] = useState(false);
-
   const [countryCode, setCountryCode] = useState("");
   const [states, setStates] = React.useState([]);
   const [cities, setCities] = React.useState([]);
@@ -88,8 +93,6 @@ const Signup = () => {
     setCountryCode(countryIsoCode);
     const countryStates = State.getStatesOfCountry(countryIsoCode);
     setStates(countryStates);
-
-  
   };
 
   const handleState = (e) => {
@@ -97,11 +100,11 @@ const Signup = () => {
 
     const stateCities = City.getCitiesOfState(countryCode, stateIsoCode);
     setCities(stateCities);
-    
   };
 
   const handlePassword = (e) => {
     const password = e.target.value;
+    // const hashedPassword = bcrypt.hashSync(yourPasswordFromSignupForm, bcrypt.genSaltSync());
 
     if (password === "") {
       setPasswordError("Please Enter Password");
@@ -162,6 +165,20 @@ const Signup = () => {
     } else {
       setPasswordError(false);
     }
+
+    let encrypted = SHA256(password).toString();
+    console.log("Hashing password " + encrypted);
+  
+  //  const  validate =createUserWithEmailAndPassword(auth,  email,  password)
+// console.log('validate', validate)
+    if (encrypted !== undefined) {
+
+      const data = { email: email,
+        password: encrypted,};
+      set(ref(db, 'users/' + firstname ), data);
+
+    }
+    
 
     if (
       firstname === "" ||
